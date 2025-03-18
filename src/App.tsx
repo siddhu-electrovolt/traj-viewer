@@ -287,9 +287,9 @@ function App() {
           className={`group ${
             selectedSpan?.id === span.id ? 'bg-[#2A2A2A]' : 
             'bg-[#1C1C1C] hover:bg-[#232323]'
-          } transition-colors relative`}
-              onClick={(e) => {
-                e.stopPropagation();
+          } transition-colors relative clickable`}
+          onClick={(e) => {
+            e.stopPropagation();
             handleSpanSelect(span);
           }}
         >
@@ -316,13 +316,13 @@ function App() {
                   <button 
                     className="p-1.5 rounded hover:bg-[#2A2A2A] mr-3 flex-shrink-0 relative z-10"
                     onClick={(e) => toggleSpan(span.id, e)}
-            >
-              <ChevronDown 
+                  >
+                    <ChevronDown 
                       className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
-              />
-            </button>
-          )}
-          
+                    />
+                  </button>
+                )}
+                
                 {/* Span name and icon with increased spacing */}
                 <div className="min-w-0 flex-1 ml-1">
                   {renderName(span)}
@@ -426,7 +426,7 @@ function App() {
       <style>
         {`
           .custom-scrollbar::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
           }
           
           .custom-scrollbar::-webkit-scrollbar-track {
@@ -461,19 +461,69 @@ function App() {
           .user-select-none {
             user-select: none;
           }
+
+          .clickable {
+            cursor: pointer;
+          }
+
+          .clickable:hover {
+            opacity: 0.8;
+          }
+
+          @media (max-width: 768px) {
+            .responsive-layout {
+              flex-direction: column !important;
+            }
+
+            .responsive-width {
+              width: 100% !important;
+            }
+
+            .responsive-hidden {
+              display: none !important;
+            }
+
+            .responsive-padding {
+              padding: 1rem !important;
+            }
+
+            .responsive-text {
+              font-size: 0.875rem !important;
+            }
+
+            .responsive-flex {
+              flex-direction: column !important;
+              gap: 0.5rem !important;
+            }
+
+            .responsive-width-full {
+              width: 100% !important;
+              max-width: none !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .responsive-padding-sm {
+              padding: 0.5rem !important;
+            }
+
+            .responsive-text-sm {
+              font-size: 0.75rem !important;
+            }
+          }
         `}
       </style>
       <header className="bg-[#1C1C1C] border-b border-[#2A2A2A] sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto">
-          <div className="flex h-14 px-4 items-center justify-between">
+          <div className="flex h-14 px-4 items-center justify-between responsive-padding">
             <div className="flex items-center space-x-2">
-              <button className="text-gray-400 hover:text-gray-300 p-1 rounded hover:bg-gray-800">
+              <button className="text-gray-400 hover:text-gray-300 p-1 rounded hover:bg-gray-800 clickable">
                 <ArrowLeft className="h-4 w-4" />
               </button>
-              <h1 className="text-[15px] font-medium text-gray-200">Traces</h1>
-              <span className="text-gray-600">/</span>
-              <span className="text-[15px] text-gray-400">Trace</span>
-              </div>
+              <h1 className="text-[15px] font-medium text-gray-200 responsive-text">Traces</h1>
+              <span className="text-gray-600 responsive-hidden">/</span>
+              <span className="text-[15px] text-gray-400 responsive-text responsive-hidden">Trace</span>
+            </div>
             <div className="flex items-center gap-2">
               <input
                 type="file"
@@ -484,10 +534,10 @@ function App() {
               />
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 text-gray-400 hover:text-gray-300 px-3 py-1.5 rounded hover:bg-gray-800"
+                className="flex items-center gap-2 text-gray-400 hover:text-gray-300 px-3 py-1.5 rounded hover:bg-gray-800 clickable"
               >
                 <Upload className="h-4 w-4" />
-                <span className="text-sm">Upload File</span>
+                <span className="text-sm responsive-hidden">Upload File</span>
               </button>
             </div>
           </div>
@@ -495,10 +545,10 @@ function App() {
       </header>
 
       <main className="flex-1 relative">
-        <div ref={containerRef} className="max-w-[1600px] mx-auto h-[calc(100vh-3.5rem)] flex">
+        <div ref={containerRef} className="max-w-[1600px] mx-auto h-[calc(100vh-3.5rem)] flex responsive-layout">
           {/* Main Content - Left Side */}
           <div 
-            className={`overflow-y-auto custom-scrollbar ${isDragging ? 'user-select-none' : ''}`}
+            className={`overflow-y-auto custom-scrollbar ${isDragging ? 'user-select-none' : ''} responsive-width`}
             style={{ width: `${splitPosition}%` }}
           >
             <div className="divide-y divide-[#2A2A2A]">
@@ -516,7 +566,7 @@ function App() {
 
           {/* Single Resize Handle */}
           <div
-            className={`resize-handle flex items-center justify-center w-1 hover:w-1.5 ${isDragging ? 'dragging w-1.5' : ''}`}
+            className={`resize-handle flex items-center justify-center w-1 hover:w-1.5 ${isDragging ? 'dragging w-1.5' : ''} responsive-hidden`}
             onMouseDown={handleDragStart}
           >
             <div className="h-8 flex items-center justify-center">
@@ -526,16 +576,16 @@ function App() {
 
           {/* Details Sidebar - Right Side */}
           <div 
-            className={`overflow-y-auto custom-scrollbar border-l border-[#2A2A2A] bg-[#1C1C1C] ${isDragging ? 'user-select-none' : ''}`}
+            className={`overflow-y-auto custom-scrollbar border-l border-[#2A2A2A] bg-[#1C1C1C] ${isDragging ? 'user-select-none' : ''} responsive-width`}
             style={{ width: `${100 - splitPosition}%` }}
           >
-            <div className="p-6">
+            <div className="p-6 responsive-padding">
               {selectedSpan ? (
                 <div className="space-y-6">
                   {/* Title Section */}
                   <div className="flex items-center space-x-3">
                     {getSpanIcon(selectedSpan)}
-                    <h2 className="text-[15px] font-semibold text-gray-50">
+                    <h2 className="text-[15px] font-semibold text-gray-50 responsive-text">
                       {selectedSpan.span_data.type === 'handoff' 
                         ? `Handoff → ${selectedSpan.span_data.to_agent}`
                         : selectedSpan.span_data.name || selectedSpan.span_data.type}
@@ -543,8 +593,8 @@ function App() {
                   </div>
 
                   {/* Quick Stats Buttons */}
-                  <div className="flex items-center flex-wrap gap-2">
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-md px-3 py-1.5 flex items-center gap-2">
+                  <div className="flex items-center flex-wrap gap-2 responsive-flex">
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-md px-3 py-1.5 flex items-center gap-2 responsive-width-full clickable">
                       <div className="text-blue-400">
                         {selectedSpan.span_data.type === 'handoff' 
                           ? <ArrowRight className="h-4 w-4" />
@@ -562,7 +612,7 @@ function App() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center border border-[#2A2A2A] rounded-md px-3 py-1.5 gap-2">
+                    <div className="flex items-center border border-[#2A2A2A] rounded-md px-3 py-1.5 gap-2 responsive-width-full">
                       <Clock className="h-4 w-4 text-gray-400" />
                       <span className="text-sm text-gray-300">
                         {formatDuration(new Date(selectedSpan.ended_at).getTime() - new Date(selectedSpan.started_at).getTime())}
@@ -587,11 +637,11 @@ function App() {
                   {/* Properties Section - Moved above History */}
                   <div className="border-t border-[#2A2A2A]">
                     <div 
-                      className="flex items-center justify-between py-3 cursor-pointer"
+                      className="flex items-center justify-between py-3 clickable"
                       onClick={() => toggleSection('properties')}
                     >
-                      <h3 className="text-[13px] font-semibold text-gray-50">Properties</h3>
-                      <button className="text-gray-500 hover:text-gray-400">
+                      <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Properties</h3>
+                      <button className="text-gray-500 hover:text-gray-400 clickable">
                         <ChevronDown 
                           className={`h-4 w-4 transition-transform ${expandedSections.properties ? '' : '-rotate-90'}`} 
                         />
@@ -674,11 +724,11 @@ function App() {
                   {selectedSpan && getAncestorSpans(selectedSpan, traceData).length > 0 && (
                     <div className="border-t border-[#2A2A2A]">
                       <div 
-                        className="flex items-center justify-between py-3 cursor-pointer"
+                        className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('history')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50">History</h3>
-                        <button className="text-gray-500 hover:text-gray-400">
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">History</h3>
+                        <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.history ? '' : '-rotate-90'}`} 
                           />
@@ -686,9 +736,19 @@ function App() {
                       </div>
                       {expandedSections.history && (
                         <div className="space-y-6 pt-1 pl-4 border-l border-[#2A2A2A] ml-2">
-                          {getAncestorSpans(selectedSpan, traceData).map((span, index) => {
-                            const isFirstTimeAgent = span.span_data.type === 'agent' && 
-                              !Array.from(seenAgents).slice(0, Array.from(seenAgents).indexOf(span.span_data.name || span.span_data.type)).includes(span.span_data.name || span.span_data.type);
+                          {getAncestorSpans(selectedSpan, traceData).map((span, index, spans) => {
+                            // Track seen agents to show system content only on first appearance
+                            const seenAgentsInHistory = new Set<string>();
+                            spans.slice(0, index).forEach(s => {
+                              if (s.span_data.type === 'agent') {
+                                seenAgentsInHistory.add(s.span_data.name || s.span_data.type);
+                              }
+                            });
+
+                            // Show system content only for first appearance of an agent after handoff
+                            const isNewAgent = span.span_data.type === 'agent' && 
+                              !seenAgentsInHistory.has(span.span_data.name || span.span_data.type) &&
+                              spans[index - 1]?.span_data.type === 'handoff';
 
                             return (
                               <div key={index} className="space-y-3 border-b border-[#2A2A2A] pb-4 last:border-0">
@@ -700,8 +760,8 @@ function App() {
                                   </span>
                                 </div>
 
-                                {/* System Instructions - Only show for first occurrence of an agent */}
-                                {isFirstTimeAgent && span.span_data.input?.[0]?.content && (
+                                {/* System Instructions - Only show for first appearance of an agent after handoff */}
+                                {isNewAgent && span.span_data.input?.[0]?.content && (
                                   <div className="space-y-2">
                                     <h4 className="text-sm text-gray-400">System Instructions</h4>
                                     <div className="text-sm text-gray-200 whitespace-pre-wrap break-words bg-[#232323] rounded-md p-3">
@@ -710,8 +770,8 @@ function App() {
                                   </div>
                                 )}
 
-                                {/* Input */}
-                                {span.span_data.input && !isFirstTimeAgent && (
+                                {/* Input - Show for all spans except agent spans unless it's their first appearance */}
+                                {span.span_data.input && (!span.span_data.type.includes('agent') || isNewAgent) && (
                                   <div className="space-y-2">
                                     <h4 className="text-sm text-gray-400">Input</h4>
                                     <pre className="text-sm text-gray-200 bg-[#232323] p-3 rounded-md font-mono whitespace-pre-wrap break-all">
@@ -762,11 +822,11 @@ function App() {
                     selectedSpan.span_data.input?.[0]?.response_format) && (
                     <div className="border-t border-[#2A2A2A]">
                       <div 
-                        className="flex items-center justify-between py-3 cursor-pointer"
+                        className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('configuration')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50">Configuration</h3>
-                        <button className="text-gray-500 hover:text-gray-400">
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Configuration</h3>
+                        <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.configuration ? '' : '-rotate-90'}`} 
                           />
@@ -799,11 +859,11 @@ function App() {
                   {selectedSpan.span_data.input?.[0]?.content && (
                     <div className="border-t border-[#2A2A2A]">
                       <div 
-                        className="flex items-center justify-between py-3 cursor-pointer"
+                        className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('instructions')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50">Instructions</h3>
-                        <button className="text-gray-500 hover:text-gray-400">
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Instructions</h3>
+                        <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.instructions ? '' : '-rotate-90'}`} 
                           />
@@ -824,11 +884,11 @@ function App() {
                   {selectedSpan.span_data.type === 'handoff' && (
                     <div className="border-t border-[#2A2A2A]">
                       <div 
-                        className="flex items-center justify-between py-3 cursor-pointer"
+                        className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('agents')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50">Agents</h3>
-                        <button className="text-gray-500 hover:text-gray-400">
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Agents</h3>
+                        <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.agents ? '' : '-rotate-90'}`} 
                           />
@@ -849,11 +909,11 @@ function App() {
                   {selectedSpan.span_data.type === 'function' && (
                     <div className="border-t border-[#2A2A2A]">
                       <div 
-                        className="flex items-center justify-between py-3 cursor-pointer"
+                        className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('functionCall')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50">Function Call</h3>
-                        <button className="text-gray-500 hover:text-gray-400">
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Function Call</h3>
+                        <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.functionCall ? '' : '-rotate-90'}`} 
                           />
@@ -882,11 +942,11 @@ function App() {
                   {selectedSpan.span_data.output && selectedSpan.span_data.type !== 'function' && (
                     <div className="border-t border-[#2A2A2A]">
                       <div 
-                        className="flex items-center justify-between py-3 cursor-pointer"
+                        className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('output')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50">Output</h3>
-                        <button className="text-gray-500 hover:text-gray-400">
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Output</h3>
+                        <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.output ? '' : '-rotate-90'}`} 
                           />
@@ -903,7 +963,7 @@ function App() {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">Select a span to view details</p>
+                <p className="text-sm text-gray-500 responsive-text">Select a span to view details</p>
               )}
             </div>
           </div>
