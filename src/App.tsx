@@ -287,55 +287,46 @@ function App() {
           className={`group ${
             selectedSpan?.id === span.id ? 'bg-[#2A2A2A]' : 
             'bg-[#1C1C1C] hover:bg-[#232323]'
-          } transition-colors relative clickable`}
+          } transition-colors relative clickable responsive-padding-sm`}
           onClick={(e) => {
             e.stopPropagation();
             handleSpanSelect(span);
           }}
         >
-          {/* Vertical connecting lines for hierarchy */}
-          {depth > 0 && (
-            <div 
-              className="absolute left-0 top-0 bottom-0 border-l border-[#2A2A2A]" 
-              style={{ left: `${(depth - 1) * 28 + 20}px` }}
-            />
-          )}
-          
-          <div className="flex items-center h-10 px-6 min-w-0 relative">
-            <div style={{ width: '500px' }} className="flex items-center flex-shrink-0 min-w-0">
-              <div className="flex items-center min-w-0 w-full">
-                {/* Indentation and connecting lines */}
-                <div style={{ width: `${depth * 28}px` }} className="flex-shrink-0 relative">
+          <div className="flex items-center h-10 px-6 min-w-0 relative responsive-stack-sm">
+            <div className="flex items-center flex-shrink-0 min-w-0 responsive-width-sm">
+              <div className="flex items-center min-w-0 w-full responsive-stack-xs">
+                {/* Indentation and hierarchy - adjusted for mobile */}
+                <div className="flex items-center gap-2 responsive-margin-sm">
                   {depth > 0 && (
-                    <div className="absolute top-1/2 -translate-y-1/2 left-0 h-px w-5 bg-[#2A2A2A]" />
-                  )}
-                </div>
-
-                {/* Expand/Collapse button with more spacing */}
-                {(span as any).children?.length > 0 && (
-                  <button 
-                    className="p-1.5 rounded hover:bg-[#2A2A2A] mr-3 flex-shrink-0 relative z-10"
-                    onClick={(e) => toggleSpan(span.id, e)}
-                  >
-                    <ChevronDown 
-                      className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
+                    <div 
+                      style={{ width: `${depth * 16}px` }}
+                      className="responsive-hidden"
                     />
-                  </button>
-                )}
-                
-                {/* Span name and icon with increased spacing */}
-                <div className="min-w-0 flex-1 ml-1">
-                  {renderName(span)}
+                  )}
+                  {(span as any).children?.length > 0 && (
+                    <button 
+                      className="p-1.5 rounded hover:bg-[#2A2A2A] flex-shrink-0 relative z-10 clickable"
+                      onClick={(e) => toggleSpan(span.id, e)}
+                    >
+                      <ChevronDown 
+                        className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? '' : '-rotate-90'}`}
+                      />
+                    </button>
+                  )}
+                  <div className="responsive-span-name">
+                    {renderName(span)}
+                  </div>
                 </div>
               </div>
             </div>
             
-            {/* Duration and progress bar */}
-            <div className="flex items-center justify-end space-x-4 min-w-0 flex-1">
-              <div className="w-20 text-right text-sm text-gray-400 font-mono flex-shrink-0">
+            {/* Duration and progress - adjusted for mobile */}
+            <div className="flex items-center justify-end space-x-4 min-w-0 flex-1 responsive-stack-sm">
+              <div className="text-right text-sm text-gray-400 font-mono responsive-text-sm">
                 {formatDuration(duration)}
               </div>
-              <div className="w-[200px] relative min-w-0 flex-shrink-0">
+              <div className="relative min-w-0 flex-shrink-0 responsive-progress-sm">
                 <div className="h-1.5 bg-[#2A2A2A] rounded-full overflow-hidden">
                   <div 
                     className={`h-full rounded-full transition-all ${getProgressBarColor(span)}`}
@@ -351,15 +342,16 @@ function App() {
           </div>
         </div>
         
-        {/* Render children */}
+        {/* Render children with responsive adjustments */}
         {isExpanded && (span as any).children?.map((child: TraceSpan, childIndex: number) => (
-          <SpanRow 
-            key={child.id} 
-            span={child} 
-            depth={depth + 1}
-            maxDuration={maxDuration}
-            index={childIndex + index + 1}
-          />
+          <div key={child.id} className="responsive-margin-sm">
+            <SpanRow 
+              span={child} 
+              depth={depth + 1}
+              maxDuration={maxDuration}
+              index={childIndex + index + 1}
+            />
+          </div>
         ))}
       </>
     );
@@ -425,8 +417,9 @@ function App() {
     <div className="min-h-screen bg-[#1C1C1C] flex flex-col">
       <style>
         {`
+          /* Base styles */
           .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
           }
           
           .custom-scrollbar::-webkit-scrollbar-track {
@@ -470,9 +463,31 @@ function App() {
             opacity: 0.8;
           }
 
+          /* Tablet and smaller desktop screens */
+          @media (max-width: 1024px) {
+            .responsive-layout {
+              max-width: 100% !important;
+              padding: 0 1rem;
+            }
+
+            .responsive-width {
+              min-width: 0 !important;
+            }
+
+            .responsive-text-md {
+              font-size: 0.9rem !important;
+            }
+
+            .responsive-spacing-md {
+              gap: 0.75rem !important;
+            }
+          }
+
+          /* Mobile landscape and tablet portrait */
           @media (max-width: 768px) {
             .responsive-layout {
               flex-direction: column !important;
+              padding: 0 !important;
             }
 
             .responsive-width {
@@ -500,8 +515,22 @@ function App() {
               width: 100% !important;
               max-width: none !important;
             }
+
+            .responsive-grid {
+              display: grid !important;
+              grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+              gap: 0.5rem !important;
+            }
+
+            .responsive-span-name {
+              max-width: 200px !important;
+              white-space: nowrap !important;
+              overflow: hidden !important;
+              text-overflow: ellipsis !important;
+            }
           }
 
+          /* Mobile portrait */
           @media (max-width: 480px) {
             .responsive-padding-sm {
               padding: 0.5rem !important;
@@ -510,19 +539,65 @@ function App() {
             .responsive-text-sm {
               font-size: 0.75rem !important;
             }
+
+            .responsive-stack-sm {
+              flex-direction: column !important;
+              align-items: stretch !important;
+            }
+
+            .responsive-width-sm {
+              width: 100% !important;
+              min-width: 0 !important;
+            }
+
+            .responsive-margin-sm {
+              margin: 0.25rem 0 !important;
+            }
+
+            .responsive-hide-sm {
+              display: none !important;
+            }
+
+            .responsive-progress-sm {
+              width: 100px !important;
+            }
+          }
+
+          /* Extra small devices */
+          @media (max-width: 360px) {
+            .responsive-text-xs {
+              font-size: 0.7rem !important;
+            }
+
+            .responsive-padding-xs {
+              padding: 0.25rem !important;
+            }
+
+            .responsive-stack-xs {
+              flex-direction: column !important;
+              gap: 0.25rem !important;
+            }
+          }
+
+          /* Dark mode optimization */
+          @media (prefers-color-scheme: dark) {
+            .dark-mode-optimize {
+              background: #1C1C1C !important;
+              color: #E5E5E5 !important;
+            }
           }
         `}
       </style>
       <header className="bg-[#1C1C1C] border-b border-[#2A2A2A] sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto">
-          <div className="flex h-14 px-4 items-center justify-between responsive-padding">
-            <div className="flex items-center space-x-2">
+          <div className="flex h-14 px-4 items-center justify-between responsive-padding responsive-padding-sm">
+            <div className="flex items-center space-x-2 responsive-stack-sm">
               <button className="text-gray-400 hover:text-gray-300 p-1 rounded hover:bg-gray-800 clickable">
                 <ArrowLeft className="h-4 w-4" />
               </button>
-              <h1 className="text-[15px] font-medium text-gray-200 responsive-text">Traces</h1>
+              <h1 className="text-[15px] font-medium text-gray-200 responsive-text responsive-text-sm">Traces</h1>
               <span className="text-gray-600 responsive-hidden">/</span>
-              <span className="text-[15px] text-gray-400 responsive-text responsive-hidden">Trace</span>
+              <span className="text-[15px] text-gray-400 responsive-text responsive-text-sm responsive-hidden">Trace</span>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -534,7 +609,7 @@ function App() {
               />
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 text-gray-400 hover:text-gray-300 px-3 py-1.5 rounded hover:bg-gray-800 clickable"
+                className="flex items-center gap-2 text-gray-400 hover:text-gray-300 px-3 py-1.5 rounded hover:bg-gray-800 clickable responsive-padding-sm"
               >
                 <Upload className="h-4 w-4" />
                 <span className="text-sm responsive-hidden">Upload File</span>
@@ -546,25 +621,26 @@ function App() {
 
       <main className="flex-1 relative">
         <div ref={containerRef} className="max-w-[1600px] mx-auto h-[calc(100vh-3.5rem)] flex responsive-layout">
-          {/* Main Content - Left Side */}
+          {/* Left side content */}
           <div 
-            className={`overflow-y-auto custom-scrollbar ${isDragging ? 'user-select-none' : ''} responsive-width`}
+            className={`overflow-y-auto custom-scrollbar ${isDragging ? 'user-select-none' : ''} responsive-width responsive-width-sm`}
             style={{ width: `${splitPosition}%` }}
           >
             <div className="divide-y divide-[#2A2A2A]">
               {traceData.map((span, index) => (
-                <SpanRow 
-                  key={span.id} 
-                  span={span}
-                  maxDuration={getMaxDuration(traceData)}
-                  index={index}
-                  depth={0}
-                />
+                <div key={span.id} className="responsive-margin-sm">
+                  <SpanRow 
+                    span={span}
+                    maxDuration={getMaxDuration(traceData)}
+                    index={index}
+                    depth={0}
+                  />
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Single Resize Handle */}
+          {/* Resize handle - hidden on mobile */}
           <div
             className={`resize-handle flex items-center justify-center w-1 hover:w-1.5 ${isDragging ? 'dragging w-1.5' : ''} responsive-hidden`}
             onMouseDown={handleDragStart}
@@ -574,18 +650,18 @@ function App() {
             </div>
           </div>
 
-          {/* Details Sidebar - Right Side */}
+          {/* Right side content */}
           <div 
-            className={`overflow-y-auto custom-scrollbar border-l border-[#2A2A2A] bg-[#1C1C1C] ${isDragging ? 'user-select-none' : ''} responsive-width`}
+            className={`overflow-y-auto custom-scrollbar border-l border-[#2A2A2A] bg-[#1C1C1C] ${isDragging ? 'user-select-none' : ''} responsive-width responsive-width-sm`}
             style={{ width: `${100 - splitPosition}%` }}
           >
-            <div className="p-6 responsive-padding">
+            <div className="p-6 responsive-padding responsive-padding-sm">
               {selectedSpan ? (
-                <div className="space-y-6">
+                <div className="space-y-6 responsive-spacing-md">
                   {/* Title Section */}
                   <div className="flex items-center space-x-3">
                     {getSpanIcon(selectedSpan)}
-                    <h2 className="text-[15px] font-semibold text-gray-50 responsive-text">
+                    <h2 className="text-[15px] font-semibold text-gray-50 responsive-text responsive-text-sm">
                       {selectedSpan.span_data.type === 'handoff' 
                         ? `Handoff → ${selectedSpan.span_data.to_agent}`
                         : selectedSpan.span_data.name || selectedSpan.span_data.type}
@@ -640,7 +716,7 @@ function App() {
                       className="flex items-center justify-between py-3 clickable"
                       onClick={() => toggleSection('properties')}
                     >
-                      <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Properties</h3>
+                      <h3 className="text-[13px] font-semibold text-gray-50 responsive-text responsive-text-sm">Properties</h3>
                       <button className="text-gray-500 hover:text-gray-400 clickable">
                         <ChevronDown 
                           className={`h-4 w-4 transition-transform ${expandedSections.properties ? '' : '-rotate-90'}`} 
@@ -727,7 +803,7 @@ function App() {
                         className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('history')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">History</h3>
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text responsive-text-sm">History</h3>
                         <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.history ? '' : '-rotate-90'}`} 
@@ -825,7 +901,7 @@ function App() {
                         className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('configuration')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Configuration</h3>
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text responsive-text-sm">Configuration</h3>
                         <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.configuration ? '' : '-rotate-90'}`} 
@@ -862,7 +938,7 @@ function App() {
                         className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('instructions')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Instructions</h3>
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text responsive-text-sm">Instructions</h3>
                         <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.instructions ? '' : '-rotate-90'}`} 
@@ -887,7 +963,7 @@ function App() {
                         className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('agents')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Agents</h3>
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text responsive-text-sm">Agents</h3>
                         <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.agents ? '' : '-rotate-90'}`} 
@@ -912,7 +988,7 @@ function App() {
                         className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('functionCall')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Function Call</h3>
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text responsive-text-sm">Function Call</h3>
                         <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.functionCall ? '' : '-rotate-90'}`} 
@@ -945,7 +1021,7 @@ function App() {
                         className="flex items-center justify-between py-3 clickable"
                         onClick={() => toggleSection('output')}
                       >
-                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text">Output</h3>
+                        <h3 className="text-[13px] font-semibold text-gray-50 responsive-text responsive-text-sm">Output</h3>
                         <button className="text-gray-500 hover:text-gray-400 clickable">
                           <ChevronDown 
                             className={`h-4 w-4 transition-transform ${expandedSections.output ? '' : '-rotate-90'}`} 
@@ -963,7 +1039,7 @@ function App() {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 responsive-text">Select a span to view details</p>
+                <p className="text-sm text-gray-500 responsive-text responsive-text-sm">Select a span to view details</p>
               )}
             </div>
           </div>
