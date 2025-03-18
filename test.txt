@@ -1,0 +1,1 @@
+if it uses any tool for example execute command, it should show those outputs in the history too, not just what was called and also for everytime, we should not show the system instruction everytime as we it is the same agent with same instructions, we just need to show at the first time
