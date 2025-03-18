@@ -37,22 +37,38 @@ interface HistoryItem {
   seenAgents: Set<string>;
 }
 
-// Add this helper function before the App component
+// Replace the existing getAncestorSpans function with this new implementation
 const getAncestorSpans = (span: TraceSpan | null, allSpans: TraceSpan[]): TraceSpan[] => {
-  const ancestors: TraceSpan[] = [];
-  let currentSpan = span;
+  if (!span) return [];
   
-  while (currentSpan?.parent_id) {
-    const parentSpan = allSpans.find(s => s.id === currentSpan?.parent_id);
-    if (parentSpan) {
-      ancestors.push(parentSpan);
-      currentSpan = parentSpan;
-    } else {
-      break;
+  // Helper function to get all spans up to a given span ID
+  const getAllSpansUpTo = (targetId: string, spans: TraceSpan[]): TraceSpan[] => {
+    const result: TraceSpan[] = [];
+    
+    for (const currentSpan of spans) {
+      if (currentSpan.id === targetId) {
+        return result;
+      }
+      
+      result.push(currentSpan);
+      
+      // If this span has children, recursively process them
+      const children = (currentSpan as any).children;
+      if (children && children.length > 0) {
+        const childResults = getAllSpansUpTo(targetId, children);
+        if (childResults.length < children.length) {
+          // If we found our target in the children, return all results
+          return [...result, ...childResults];
+        }
+        // Otherwise, add all children and continue searching
+        result.push(...children);
+      }
     }
-  }
+    
+    return result;
+  };
   
-  return ancestors.reverse();
+  return getAllSpansUpTo(span.id, allSpans);
 };
 
 function App() {
