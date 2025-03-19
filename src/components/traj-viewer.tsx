@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, ArrowLeft, MessageSquare, ArrowRight, Settings2, FileText, FolderOpen, Terminal, CircleDot, Clock, ClipboardCopy, Upload, GripVertical } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchTraceById } from '../services/api';
-import type { TraceData, ApiResponse } from '../services/api';
+import type { ApiResponse, TraceData } from '../services/api';
 
 interface TraceSpan {
   object: string;
@@ -111,7 +111,7 @@ function TrajViewer() {
     try {
       const response: ApiResponse<TraceData> = await fetchTraceById(traceId);
       
-      if (response.success && response.data.spans) {
+      if (response.success && response.data.spans && response.data.spans.length > 0) {
         console.log('Trace completion status:', {
           traceId: response.data.trace_id,
           isComplete: response.data.isComplete,
@@ -125,9 +125,9 @@ function TrajViewer() {
         
         if (isPollingUpdate) {
           const currentExpandedState = new Set(expandedSpans);
-          processTraceData(response.data.spans, currentExpandedState);
+          processTraceData(response.data.spans as TraceSpan[], currentExpandedState);
         } else {
-          processTraceData(response.data.spans);
+          processTraceData(response.data.spans as TraceSpan[]);
         }
         setError(null);
       } else {
@@ -193,9 +193,9 @@ function TrajViewer() {
 
     try {
       const text = await file.text();
-      const data = JSON.parse(text) as TraceData;
-      if (data.success && data.data.spans) {
-        processTraceData(data.data.spans);
+      const data: ApiResponse<TraceData> = JSON.parse(text);
+      if (data.success && data.data.spans && data.data.spans.length > 0) {
+        processTraceData(data.data.spans as TraceSpan[]);
       }
     } catch (error) {
       console.error('Error loading trace data:', error);
