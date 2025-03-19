@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronDown, ArrowLeft, MessageSquare, ArrowRight, Settings2, FileText, FolderOpen, Terminal, CircleDot, Clock, ClipboardCopy, Upload, GripVertical } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { fetchTraceById } from '../services/api';
+import type { TraceData, ApiResponse } from '../services/api';
 
 interface TraceSpan {
   object: string;
@@ -20,19 +22,6 @@ interface TraceSpan {
     handoffs?: string[];
   };
   error: null | any;
-}
-
-interface TraceData {
-  success: boolean;
-  data: {
-    _id: string;
-    trace_id: string;
-    workflow_name?: string;
-    spans?: TraceSpan[];
-    isComplete: boolean;
-    created_at: string;
-    updated_at: string;
-  };
 }
 
 type SectionName = 'properties' | 'configuration' | 'instructions' | 'functionCall' | 'agents' | 'output' | 'previousStep' | 'history';
@@ -90,6 +79,7 @@ function TrajViewer() {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartXRef = useRef<number>(0);
   const [isPolling, setIsPolling] = useState(true); // Add state for controlling polling
+  const [error, setError] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<SectionName, boolean>>({
     properties: true,
     configuration: true,
@@ -101,20 +91,16 @@ function TrajViewer() {
     history: true
   });
 
-  // Load default trace file on component mount and setup polling
   useEffect(() => {
     if (traceId) {
-      // Initial load
       loadTraceFile(traceId);
 
-      // Setup polling interval
       const pollInterval = setInterval(() => {
         if (isPolling) {
           loadTraceFile(traceId, true);
         }
-      }, 1000); // Poll every 1 second
+      }, 1000);
 
-      // Cleanup function to clear interval when component unmounts
       return () => {
         clearInterval(pollInterval);
       };
@@ -123,37 +109,34 @@ function TrajViewer() {
 
   const loadTraceFile = async (traceId: string, isPollingUpdate: boolean = false) => {
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${apiBaseUrl}/traces/${traceId}`);
-      const data: TraceData = await response.json();
+      const response: ApiResponse<TraceData> = await fetchTraceById(traceId);
       
-      if (data.success && data.data.spans) {
-        // Log the isComplete status
+      if (response.success && response.data.spans) {
         console.log('Trace completion status:', {
-          traceId: data.data.trace_id,
-          isComplete: data.data.isComplete,
+          traceId: response.data.trace_id,
+          isComplete: response.data.isComplete,
           timestamp: new Date().toISOString()
         });
 
-        // If the trace is complete, stop polling
-        if (data.data.isComplete) {
+        if (response.data.isComplete) {
           console.log('Stopping polling - trace is complete');
           setIsPolling(false);
         }
         
-        // If this is a polling update, preserve expanded state
         if (isPollingUpdate) {
           const currentExpandedState = new Set(expandedSpans);
-          processTraceData(data.data.spans, currentExpandedState);
+          processTraceData(response.data.spans, currentExpandedState);
         } else {
-          processTraceData(data.data.spans);
+          processTraceData(response.data.spans);
         }
+        setError(null);
       } else {
         console.error('Error loading trace data: Invalid response format');
+        setError('Invalid trace data format received');
       }
     } catch (error) {
       console.error('Error loading trace data:', error);
-      // If there's an error during polling, we might want to stop polling
+      setError('Failed to load trace. Please check your authentication.');
       if (isPollingUpdate) {
         setIsPolling(false);
       }

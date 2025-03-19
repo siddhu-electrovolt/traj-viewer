@@ -18,41 +18,34 @@ import {
   Typography,
   SelectChangeEvent,
 } from '@mui/material';
-
-interface Trace {
-  _id: string;
-  trace_id: string;
-  workflow_name: string;
-  group_id: string | null;
-  metadata: any;
-  created_at: string;
-}
+import { fetchTraces } from '../services/api';
+import type { TraceData } from '../services/api';
 
 const TraceList: React.FC = () => {
   const navigate = useNavigate();
-  const [traces, setTraces] = useState<Trace[]>([]);
+  const [traces, setTraces] = useState<TraceData[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('workflow_name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchTraces = async () => {
+  const loadTraces = async () => {
     try {
-      const response = await fetch(
-        `https://traj-backend.onrender.com/api/traces?page=${page + 1}&limit=${rowsPerPage}`
-      );
-      const data = await response.json();
-      setTraces(data.data || []);
-      setTotalCount(data.pagination.total || 0);
+      const response = await fetchTraces(page + 1, rowsPerPage);
+      setTraces(response.data || []);
+      setTotalCount(response.pagination?.total || 0);
+      setError(null);
     } catch (error) {
       console.error('Error fetching traces:', error);
+      setError('Failed to load traces. Please check your authentication.');
     }
   };
 
   useEffect(() => {
-    fetchTraces();
+    loadTraces();
   }, [page, rowsPerPage, sortBy, sortOrder]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
